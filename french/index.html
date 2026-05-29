@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <title>French Immersion Parent Bridge</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="masthead">
+        <section class="study-banner" aria-labelledby="app-title">
+          <div class="banner-copy">
+            <p class="eyebrow">French Immersion Parent Bridge</p>
+            <h1 id="app-title">Support Grade 1 French from home</h1>
+            <p class="lead">A 12-week parent program built around short daily practice, school phrases, listening, spaced review, and low-pressure French moments with your child.</p>
+            <div class="hero-actions">
+              <button class="button primary" type="button" data-action="start-today">
+                <span aria-hidden="true">&#9658;</span>
+                Start today
+              </button>
+              <button class="button secondary" type="button" data-action="open-guide">
+                <span aria-hidden="true">&#9432;</span>
+                How to use
+              </button>
+              <button class="button secondary" type="button" data-speak="Bonjour, on commence doucement.">
+                <span aria-hidden="true">&#9835;</span>
+                Hear French
+              </button>
+            </div>
+          </div>
+          <img src="assets/study-table-banner.png" alt="A parent study table with French notes, school supplies, and a child's book.">
+        </section>
+
+        <nav class="tabs" aria-label="Program sections">
+          <button class="tab active" type="button" data-view-target="today">Today</button>
+          <button class="tab" type="button" data-view-target="program">12 Weeks</button>
+          <button class="tab" type="button" data-view-target="phrases">Phrasebook</button>
+          <button class="tab" type="button" data-view-target="flashcards">Flashcards</button>
+          <button class="tab" type="button" data-view-target="resources">Resources</button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="view active" id="view-today" data-view="today" aria-labelledby="today-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Daily Session</p>
+              <h2 id="today-heading">Today</h2>
+            </div>
+            <div class="progress-readout" aria-live="polite">
+              <span id="completed-days">0</span>/<span id="total-days">60</span> sessions
+            </div>
+          </div>
+
+          <div class="progress-track" aria-label="Overall program progress">
+            <div class="progress-fill" id="overall-progress"></div>
+          </div>
+
+          <div class="today-layout">
+            <article class="lesson-panel" aria-labelledby="lesson-title">
+              <div class="lesson-meta" id="lesson-meta"></div>
+              <h3 id="lesson-title"></h3>
+              <p id="lesson-focus"></p>
+              <div class="minute-grid" aria-label="Daily time plan">
+                <div>
+                  <strong>10</strong>
+                  <span>Lesson</span>
+                </div>
+                <div>
+                  <strong>5</strong>
+                  <span>Listen</span>
+                </div>
+                <div>
+                  <strong>5</strong>
+                  <span>Review</span>
+                </div>
+                <div>
+                  <strong>3</strong>
+                  <span>Child moment</span>
+                </div>
+              </div>
+              <div class="daily-actions">
+                <button class="button primary" type="button" data-action="complete-day">
+                  <span aria-hidden="true">&#10003;</span>
+                  Complete session
+                </button>
+                <button class="button ghost" type="button" data-action="print-plan">
+                  <span aria-hidden="true">&#9113;</span>
+                  Print
+                </button>
+              </div>
+            </article>
+
+            <aside class="checklist-panel" aria-labelledby="checklist-heading">
+              <h3 id="checklist-heading">Session Blocks</h3>
+              <div id="daily-checklist" class="checklist"></div>
+            </aside>
+          </div>
+
+          <div class="practice-band">
+            <section class="practice-panel" aria-labelledby="today-phrases-heading">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">Listen and Repeat</p>
+                  <h3 id="today-phrases-heading">Key Phrases</h3>
+                </div>
+              </div>
+              <div id="today-phrases" class="phrase-list"></div>
+            </section>
+
+            <section class="practice-panel" aria-labelledby="child-moment-heading">
+              <div class="section-heading compact">
+                <div>
+                  <p class="eyebrow">At Home</p>
+                  <h3 id="child-moment-heading">Child Moment</h3>
+                </div>
+              </div>
+              <p id="child-moment" class="plain-copy"></p>
+              <p id="parent-note" class="note-copy"></p>
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-program" data-view="program" aria-labelledby="program-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Path</p>
+              <h2 id="program-heading">12-Week Program</h2>
+            </div>
+            <button class="button ghost" type="button" data-action="reset-progress">
+              <span aria-hidden="true">&#8635;</span>
+              Reset progress
+            </button>
+          </div>
+          <div id="week-list" class="week-list"></div>
+        </section>
+
+        <section class="view" id="view-phrases" data-view="phrases" aria-labelledby="phrases-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">School and Home</p>
+              <h2 id="phrases-heading">Phrasebook</h2>
+            </div>
+            <label class="search-field">
+              <span>Search</span>
+              <input id="phrase-search" type="search" autocomplete="off" placeholder="lunch, help, read">
+            </label>
+          </div>
+          <div id="phrase-categories" class="category-row" aria-label="Phrase categories"></div>
+          <div id="phrase-results" class="phrase-list phrasebook-list"></div>
+        </section>
+
+        <section class="view" id="view-flashcards" data-view="flashcards" aria-labelledby="flashcards-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Spaced Review</p>
+              <h2 id="flashcards-heading">Flashcards</h2>
+            </div>
+            <div class="progress-readout">
+              <span id="due-count">0</span> due
+            </div>
+          </div>
+
+          <div class="flashcard-tool">
+            <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-pressed="false">
+              <p id="card-category" class="eyebrow"></p>
+              <p id="card-front" class="card-front"></p>
+              <p id="card-back" class="card-back hidden"></p>
+            </div>
+            <div class="flashcard-actions">
+              <button class="button secondary" type="button" data-action="speak-card">
+                <span aria-hidden="true">&#9835;</span>
+                Listen
+              </button>
+              <button class="button secondary" type="button" data-action="reveal-card">
+                <span aria-hidden="true">&#9673;</span>
+                Reveal
+              </button>
+              <button class="button ghost" type="button" data-action="again-card">
+                Review again
+              </button>
+              <button class="button primary" type="button" data-action="know-card">
+                <span aria-hidden="true">&#10003;</span>
+                Know it
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="view-resources" data-view="resources" aria-labelledby="resources-heading">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Learning Stack</p>
+              <h2 id="resources-heading">Recommended Resources</h2>
+            </div>
+          </div>
+
+          <div class="resource-grid">
+            <article class="resource-item">
+              <h3>Daily habit</h3>
+              <p><strong>Duolingo</strong> is useful for short beginner practice and momentum. Keep it to 10 minutes and pair it with speaking aloud.</p>
+            </article>
+            <article class="resource-item">
+              <h3>Adult structure</h3>
+              <p><strong>Babbel</strong> or a beginner CEFR course can fill in pronunciation, grammar, and conversation patterns more directly.</p>
+            </article>
+            <article class="resource-item">
+              <h3>Immersion input</h3>
+              <p><strong>Rosetta Stone</strong>, library apps, French songs, picture books, and cartoons help your ear adjust without pressure.</p>
+            </article>
+            <article class="resource-item">
+              <h3>Feedback</h3>
+              <p><strong>Alliance Française</strong> or a tutor is best when you want real-time correction, especially for pronunciation and confidence.</p>
+            </article>
+          </div>
+
+          <section class="principles" aria-labelledby="principles-heading">
+            <h3 id="principles-heading">Program Principles</h3>
+            <ul>
+              <li>Short daily practice beats occasional long sessions.</li>
+              <li>Listening and speaking come before perfect grammar.</li>
+              <li>Active recall and spaced review make vocabulary stick.</li>
+              <li>French at home should feel warm, brief, and low-pressure.</li>
+              <li>English reading still helps literacy and school confidence.</li>
+            </ul>
+          </section>
+        </section>
+
+      </main>
+    </div>
+
+    <dialog id="reset-dialog">
+      <form method="dialog" class="dialog-form">
+        <h2>Reset progress?</h2>
+        <p>This clears completed sessions and flashcard scheduling on this browser.</p>
+        <div class="dialog-actions">
+          <button class="button secondary" value="cancel" type="submit">Cancel</button>
+          <button class="button primary danger" value="confirm" type="submit">Reset</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="guide-dialog" class="guide-dialog">
+      <div class="guide-panel">
+        <div class="guide-header">
+          <div>
+            <p class="eyebrow">How to Use This Site</p>
+            <h2>What to do each time</h2>
+          </div>
+          <button class="icon-button" type="button" data-action="close-guide" aria-label="Close guide">&times;</button>
+        </div>
+
+        <div class="guide-grid">
+          <section class="guide-card guide-primary">
+            <h3>Daily routine</h3>
+            <ol class="number-list">
+              <li>Open <strong>Today</strong>.</li>
+              <li>Do the four session blocks: Lesson, Listen, Review, Child moment.</li>
+              <li>Press <strong>Listen</strong> beside each French phrase and repeat out loud.</li>
+              <li>Try the <strong>Child Moment</strong> once with your son. Keep it short and easy.</li>
+              <li>Click <strong>Complete session</strong> when you are finished.</li>
+              <li>Open <strong>Flashcards</strong> for a few minutes of review.</li>
+            </ol>
+          </section>
+
+          <section class="guide-card">
+            <h3>Use the tabs</h3>
+            <div class="guide-actions">
+              <button class="button secondary" type="button" data-action="guide-open" data-guide-view="today">Today</button>
+              <button class="button secondary" type="button" data-action="guide-open" data-guide-view="program">12 Weeks</button>
+              <button class="button secondary" type="button" data-action="guide-open" data-guide-view="phrases">Phrasebook</button>
+              <button class="button secondary" type="button" data-action="guide-open" data-guide-view="flashcards">Flashcards</button>
+              <button class="button secondary" type="button" data-action="guide-open" data-guide-view="resources">Resources</button>
+            </div>
+          </section>
+
+          <section class="guide-card">
+            <h3>Weekly rhythm</h3>
+            <ul class="plain-list">
+              <li><strong>Monday to Friday:</strong> one daily session.</li>
+              <li><strong>Weekend:</strong> repeat one useful day or review flashcards.</li>
+              <li><strong>Anytime:</strong> search the Phrasebook when a school/home situation comes up.</li>
+            </ul>
+          </section>
+
+          <section class="guide-card">
+            <h3>First week</h3>
+            <ul class="plain-list">
+              <li>Do not try to master everything.</li>
+              <li>Use only one or two phrases with your son.</li>
+              <li>Say French out loud even if it feels awkward.</li>
+              <li>Let the site move you to the next day after completion.</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="dialog-actions guide-footer">
+          <button class="button primary" type="button" data-action="guide-open" data-guide-view="today">
+            <span aria-hidden="true">&#9658;</span>
+            Start with Today
+          </button>
+          <button class="button ghost" type="button" data-action="close-guide">Close</button>
+        </div>
+      </div>
+    </dialog>
+  </body>
+</html>
