@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1729">
+<title>Pause — Workplace Calm</title>
+<style>
+  /* ---------- Theme tokens ---------- */
+  :root{
+    --bg:#0f1729; --bg2:#16213d; --card:#1b2440; --card2:#222d52;
+    --ink:#eef2ff; --muted:#9fb0d9; --line:rgba(255,255,255,.08);
+    --accent:#5eead4; --accent-ink:#04211c;
+    --teal:#5eead4; --lav:#a7a0ff; --rose:#ff9bb3; --amber:#ffc46b; --sky:#7cc4ff; --mint:#86efac;
+    --shadow:0 12px 40px rgba(0,0,0,.45);
+    --radius:22px;
+  }
+  html[data-theme="light"]{
+    --bg:#eef2fb; --bg2:#e4ebf8; --card:#ffffff; --card2:#f4f7ff;
+    --ink:#16213d; --muted:#5b6b92; --line:rgba(20,30,60,.10);
+    --accent:#0d9488; --accent-ink:#ffffff;
+    --shadow:0 12px 34px rgba(40,60,110,.18);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 50% -10%, var(--bg2), transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    display:flex; justify-content:center;
+    overscroll-behavior:none;
+  }
+  /* ---------- App shell ---------- */
+  #app{
+    width:100%; max-width:480px; min-height:100dvh;
+    display:flex; flex-direction:column;
+    position:relative; padding-bottom:env(safe-area-inset-bottom);
+  }
+  header.bar{
+    display:flex; align-items:center; gap:10px;
+    padding:16px 18px calc(12px); position:sticky; top:0; z-index:20;
+    background:linear-gradient(var(--bg), transparent);
+  }
+  .brand{display:flex; align-items:center; gap:9px; font-weight:700; letter-spacing:.2px;}
+  .brand .dot{width:13px;height:13px;border-radius:50%;
+    background:radial-gradient(circle at 30% 30%, var(--teal), var(--lav)); box-shadow:0 0 18px var(--teal);}
+  .bar .spacer{flex:1;}
+  .iconbtn{
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:999px; padding:8px 13px; font-size:13px; font-weight:600;
+    cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+  }
+  .iconbtn.help{color:var(--rose); border-color:rgba(255,155,179,.35);}
+  .iconbtn:active{transform:scale(.96);}
+
+  main{flex:1; padding:6px 18px 28px; display:flex; flex-direction:column;}
+
+  /* ---------- Home ---------- */
+  .hero h1{font-size:30px; line-height:1.1; margin:6px 0 6px;}
+  .hero p{color:var(--muted); margin:0 0 18px; font-size:15px; line-height:1.5;}
+  .grid{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    text-align:left; border:1px solid var(--line); border-radius:var(--radius);
+    background:linear-gradient(160deg, var(--card), var(--card2));
+    padding:18px; cursor:pointer; color:var(--ink);
+    display:flex; gap:14px; align-items:center; box-shadow:var(--shadow);
+    transition:transform .15s ease, border-color .15s ease;
+  }
+  .card:active{transform:scale(.985);}
+  .card .ic{
+    width:52px; height:52px; flex:none; border-radius:16px;
+    display:grid; place-items:center;
+    background:var(--bg2); border:1px solid var(--line);
+  }
+  .card .ic svg{width:26px;height:26px;}
+  .card h3{margin:0 0 3px; font-size:17px;}
+  .card .blurb{margin:0; color:var(--muted); font-size:13.5px; line-height:1.4;}
+  .card .meta{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px;
+    background:var(--bg2); color:var(--muted); border:1px solid var(--line);}
+  .chip.accent{color:var(--accent-ink); background:var(--accent); border-color:transparent;}
+
+  .disclaimer{
+    margin-top:22px; font-size:12.5px; color:var(--muted); line-height:1.55;
+    border-top:1px solid var(--line); padding-top:16px;
+  }
+  .disclaimer a, .linkbtn{color:var(--teal); cursor:pointer; text-decoration:underline; background:none;border:none;font:inherit;padding:0;}
+
+  /* ---------- Player ---------- */
+  #player{display:none; flex:1; flex-direction:column;}
+  #player.on{display:flex;}
+  .pbar{display:flex; align-items:center; gap:12px; padding:14px 18px 4px;}
+  .pbar .back{
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    border-radius:999px; width:40px;height:40px; font-size:18px; cursor:pointer; flex:none;
+  }
+  .dots{display:flex; gap:6px; flex:1;}
+  .dots i{height:5px; flex:1; border-radius:999px; background:var(--line); transition:background .3s;}
+  .dots i.done{background:var(--accent);}
+  .dots i.now{background:var(--ink);}
+  .stop{font-size:12.5px; color:var(--muted); background:none; border:none; cursor:pointer; flex:none;}
+
+  .stage{flex:1; padding:10px 22px 0; display:flex; flex-direction:column; animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .eyebrow{font-size:12px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--accent); margin-bottom:8px;}
+  .stage h2{font-size:26px; line-height:1.15; margin:0 0 12px;}
+  .stage .lead{color:var(--muted); font-size:16px; line-height:1.55; margin:0 0 18px;}
+  .reveal{
+    border:1px solid var(--line); background:var(--card); border-radius:16px;
+    padding:14px 16px; margin-bottom:18px;
+  }
+  .reveal .rl{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:5px;}
+  .reveal .rv{font-size:16px; line-height:1.45;}
+
+  textarea, input[type=text]{
+    width:100%; background:var(--card); color:var(--ink);
+    border:1px solid var(--line); border-radius:14px; padding:14px;
+    font:inherit; font-size:16px; resize:vertical; line-height:1.5;
+  }
+  textarea{min-height:96px;}
+  textarea:focus, input:focus{outline:none; border-color:var(--accent);}
+  .twocol{display:flex; flex-direction:column; gap:12px;}
+  .twocol .f label{display:block; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--muted);}
+
+  .stems{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .stems button{font-size:12.5px; padding:7px 12px; border-radius:999px;
+    background:var(--bg2); border:1px solid var(--line); color:var(--muted); cursor:pointer;}
+  .stems button:active{transform:scale(.96);}
+
+  /* taggable selects (distortions / mood) */
+  .selects{display:flex; flex-wrap:wrap; gap:10px;}
+  .selects button{
+    font-size:14px; padding:11px 15px; border-radius:14px;
+    background:var(--card); border:1px solid var(--line); color:var(--ink); cursor:pointer;
+    transition:all .15s;
+  }
+  .selects button[aria-pressed=true]{background:var(--accent); color:var(--accent-ink); border-color:transparent;}
+
+  /* tap-to-find slots (grounding) */
+  .slots{display:flex; flex-direction:column; gap:10px; margin-bottom:8px;}
+  .slot{
+    display:flex; align-items:center; gap:14px; cursor:pointer;
+    border:1px solid var(--line); background:var(--card); border-radius:16px; padding:15px 16px;
+    transition:all .2s;
+  }
+  .slot .num{width:34px;height:34px;border-radius:50%; flex:none; display:grid; place-items:center;
+    border:1px solid var(--line); font-weight:700; color:var(--muted);}
+  .slot .lab{color:var(--muted); font-size:15px;}
+  .slot[aria-pressed=true]{border-color:var(--accent); background:linear-gradient(var(--card), var(--card2));}
+  .slot[aria-pressed=true] .num{background:var(--accent); color:var(--accent-ink); border-color:transparent;}
+  .slot[aria-pressed=true] .lab{color:var(--ink);}
+
+  /* list add (brain dump) */
+  .addrow{display:flex; gap:10px; margin-bottom:12px;}
+  .addrow button{flex:none; padding:0 18px; border-radius:14px; border:none; cursor:pointer;
+    background:var(--accent); color:var(--accent-ink); font-weight:700; font-size:15px;}
+  .items{display:flex; flex-direction:column; gap:9px;}
+  .items .it{display:flex; align-items:center; gap:10px; padding:12px 14px; border-radius:13px;
+    background:var(--card); border:1px solid var(--line); animation:fade .25s ease;}
+  .items .it.locked{opacity:.55;}
+  .items .it span{flex:1; font-size:15px;}
+  .items .it button{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;}
+
+  /* slider */
+  .slwrap{margin:6px 0 4px;}
+  .slval{font-size:54px; font-weight:800; text-align:center; line-height:1;
+    background:linear-gradient(120deg,var(--teal),var(--lav)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .slcap{text-align:center; color:var(--muted); font-size:13px; margin:4px 0 18px;}
+  input[type=range]{ -webkit-appearance:none; appearance:none; width:100%; height:14px; border-radius:999px;
+    background:linear-gradient(90deg, var(--mint), var(--amber) 55%, var(--rose)); outline:none;}
+  input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:34px;height:34px;border-radius:50%;
+    background:#fff; border:4px solid var(--accent); cursor:pointer; box-shadow:0 4px 14px rgba(0,0,0,.35);}
+  input[type=range]::-moz-range-thumb{ width:30px;height:30px;border-radius:50%; background:#fff;
+    border:4px solid var(--accent); cursor:pointer;}
+  .scaleends{display:flex; justify-content:space-between; color:var(--muted); font-size:12px; margin-top:8px;}
+  .delta{margin-top:16px; text-align:center; font-size:15px; color:var(--muted); min-height:22px;}
+  .delta b{color:var(--mint);}
+  .gentle{margin-top:16px; border:1px solid rgba(255,155,179,.4); background:rgba(255,155,179,.10);
+    border-radius:14px; padding:13px 15px; font-size:13.5px; line-height:1.5; color:var(--ink); display:none;}
+  .gentle.on{display:block;}
+
+  /* breath / tension pacer */
+  .pacer{display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; gap:18px; padding:14px 0;}
+  .pacer-stage{position:relative; width:260px; height:260px; display:grid; place-items:center;}
+  .pacer-ring{position:absolute; inset:0; border-radius:50%; border:1px dashed var(--line);}
+  .pacer-circle{
+    width:200px; height:200px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--teal), var(--lav));
+    box-shadow:0 0 60px rgba(94,234,212,.35); transform:scale(.55); will-change:transform;
+  }
+  .pacer-text{position:absolute; text-align:center; pointer-events:none;}
+  .pacer-label{font-size:21px; font-weight:700; color:#05242f; text-shadow:0 1px 6px rgba(255,255,255,.4);}
+  .pacer-count{font-size:15px; color:#05242f; opacity:.7; margin-top:2px; min-height:18px;}
+  .pacer-cycles{color:var(--muted); font-size:13px; min-height:18px;}
+
+  /* footer button */
+  .foot{padding:14px 22px calc(20px + env(safe-area-inset-bottom)); position:sticky; bottom:0;
+    background:linear-gradient(transparent, var(--bg) 35%);}
+  .cta{width:100%; border:none; border-radius:16px; padding:17px; font-size:17px; font-weight:700; cursor:pointer;
+    background:var(--accent); color:var(--accent-ink); box-shadow:0 10px 30px rgba(94,234,212,.25);}
+  .cta:active{transform:scale(.99);}
+  .cta.ghost{background:var(--card); color:var(--ink); border:1px solid var(--line); box-shadow:none;}
+  .cta:disabled{opacity:.4; cursor:not-allowed;}
+  .pulse{animation:pulse 2.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 10px 30px rgba(94,234,212,.18);}50%{box-shadow:0 10px 38px rgba(94,234,212,.5);}}
+
+  /* modal */
+  .scrim{position:fixed; inset:0; background:rgba(5,9,20,.6); backdrop-filter:blur(3px);
+    display:none; align-items:flex-end; justify-content:center; z-index:50;}
+  .scrim.on{display:flex;}
+  .sheet{width:100%; max-width:480px; background:var(--bg); border-top-left-radius:26px; border-top-right-radius:26px;
+    border-top:1px solid var(--line); padding:24px 22px calc(26px + env(safe-area-inset-bottom)); animation:up .3s ease;}
+  @keyframes up{from{transform:translateY(40px); opacity:.6;} to{transform:none; opacity:1;}}
+  .sheet h3{margin:0 0 10px; font-size:20px;}
+  .sheet p{color:var(--muted); font-size:14px; line-height:1.6; margin:0 0 14px;}
+  .sheet .row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid var(--line);}
+  .sheet .crisis{display:block; background:var(--rose); color:#3a0010; text-align:center; font-weight:700;
+    padding:15px; border-radius:14px; text-decoration:none; margin-bottom:10px; font-size:16px;}
+  .sheet .crisis.alt{background:var(--card); color:var(--ink); border:1px solid var(--line);}
+  .switch{position:relative; width:50px; height:30px; flex:none;}
+  .switch input{opacity:0; width:100%; height:100%; margin:0; cursor:pointer;}
+  .switch .tr{position:absolute; inset:0; border-radius:999px; background:var(--line); transition:.2s;}
+  .switch .tr:before{content:""; position:absolute; width:24px;height:24px; border-radius:50%; background:#fff; top:3px; left:3px; transition:.2s;}
+  .switch input:checked + .tr{background:var(--accent);}
+  .switch input:checked + .tr:before{transform:translateX(20px);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="bar">
+    <div class="brand"><span class="dot"></span> Pause</div>
+    <div class="spacer"></div>
+    <button class="iconbtn" id="themeBtn" title="Toggle theme">◐</button>
+    <button class="iconbtn help" id="helpBtn">♥ Help</button>
+  </header>
+
+  <!-- HOME -->
+  <main id="home">
+    <div class="hero">
+      <h1>A calmer minute,<br>right at your desk.</h1>
+      <p>Short, science-backed exercises for stressful moments at work. Silent, discreet, and private — your words never leave this device.</p>
+    </div>
+    <div class="grid" id="cards"></div>
+    <div class="disclaimer">
+      These are self-guided wellness tools, not therapy or medical advice. If you're in distress,
+      <button class="linkbtn" id="helpBtn2">find urgent help</button>.
+      <br>· <button class="linkbtn" id="aboutBtn">About &amp; privacy</button>
+    </div>
+  </main>
+
+  <!-- PLAYER -->
+  <section id="player">
+    <div class="pbar">
+      <button class="back" id="backBtn" aria-label="Back">‹</button>
+      <div class="dots" id="dots"></div>
+      <button class="stop" id="exitBtn">I need to stop</button>
+    </div>
+    <div class="stage" id="stage"></div>
+    <div class="foot"><button class="cta" id="nextBtn">Continue</button></div>
+  </section>
+</div>
+
+<!-- HELP / CRISIS SHEET -->
+<div class="scrim" id="helpScrim">
+  <div class="sheet">
+    <h3>Need urgent help?</h3>
+    <p>If you're thinking about harming yourself or are in crisis, please reach out now. You deserve support.</p>
+    <a class="crisis" href="tel:988">Call or text 988 — Suicide Crisis Helpline (Canada)</a>
+    <a class="crisis alt" href="tel:911">Call 911 for an emergency</a>
+    <p style="margin-top:6px">Outside Canada, contact your local emergency number or a crisis line in your country.</p>
+    <button class="cta ghost" data-close>Close</button>
+  </div>
+</div>
+
+<!-- ABOUT SHEET -->
+<div class="scrim" id="aboutScrim">
+  <div class="sheet">
+    <h3>About &amp; privacy</h3>
+    <p><b>Pause</b> guides you through public-domain calming techniques — breathwork, CBT reframing, grounding, muscle relaxation, and mindful resets — adapted for short, discreet use at work.</p>
+    <p><b>Your privacy:</b> everything happens on this device. Anything you type is held only in memory and is cleared the moment you leave an exercise. Nothing is sent to a server or saved to your history.</p>
+    <div class="row">
+      <span>Haptic cues (vibration)</span>
+      <label class="switch"><input type="checkbox" id="hapticToggle" checked><span class="tr"></span></label>
+    </div>
+    <div class="row" style="border-bottom:1px solid var(--line)">
+      <span>Light theme</span>
+      <label class="switch"><input type="checkbox" id="lightToggle"><span class="tr"></span></label>
+    </div>
+    <p style="margin-top:14px">Not a substitute for professional care. If stress is persistent or severe, consider speaking with your doctor, an EAP counsellor, or a mental-health professional.</p>
+    <button class="cta ghost" data-close>Close</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============ small helpers ============ */
+const $ = s => document.querySelector(s);
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls)e.className=cls; if(html!=null)e.innerHTML=html; return e; };
+const settings = { haptics:true };
+function vibrate(ms){ if(settings.haptics && navigator.vibrate){ try{ navigator.vibrate(ms); }catch(e){} } }
+
+/* timers that we can cancel whenever we leave a step */
+const Timers = {
+  t:[], i:[],
+  timeout(fn,ms){ const id=setTimeout(fn,ms); this.t.push(id); return id; },
+  interval(fn,ms){ const id=setInterval(fn,ms); this.i.push(id); return id; },
+  clearAll(){ this.t.forEach(clearTimeout); this.i.forEach(clearInterval); this.t=[]; this.i=[]; }
+};
+
+/* ============ icons ============ */
+const ICONS = {
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="#5eead4" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="3"/></svg>',
+  cbt:'<svg viewBox="0 0 24 24" fill="none" stroke="#a7a0ff" stroke-width="2"><path d="M12 3a8 8 0 0 0-5 14l-1 4 5-2a8 8 0 1 0 1-16z"/><path d="M8 11h8M8 14h5"/></svg>',
+  ground:'<svg viewBox="0 0 24 24" fill="none" stroke="#7cc4ff" stroke-width="2"><circle cx="12" cy="9" r="4"/><path d="M5 20c1.5-4 12-4 14 0"/></svg>',
+  pmr:'<svg viewBox="0 0 24 24" fill="none" stroke="#ffc46b" stroke-width="2"><path d="M6 12a6 6 0 0 1 12 0"/><path d="M4 12h2M18 12h2M12 4v2"/><circle cx="12" cy="14" r="2.2"/></svg>',
+  focus:'<svg viewBox="0 0 24 24" fill="none" stroke="#86efac" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.4" fill="#86efac"/></svg>',
+  moon:'<svg viewBox="0 0 24 24" fill="none" stroke="#ff9bb3" stroke-width="2"><path d="M20 14a8 8 0 0 1-10-10 8 8 0 1 0 10 10z"/></svg>'
+};
+
+/* ============ shared step pieces ============ */
+const DISTORTIONS = ["Predicting the future","Mind-reading","All-or-nothing thinking","Blaming myself for everything","Catastrophizing","Discounting the positives"];
+const STEMS = ["A more balanced way to see this is…","Even if the worst happened, I could…","What I'd tell a respected colleague is…"];
+const MOODS = ["Tense","Tired","Scattered","Frustrated","Flat","Wired","Okay","Calm"];
+
+/* breathing patterns: {label, secs, scale, color?} */
+const BOX = [
+  {label:"Breathe in", secs:4, scale:1.0},
+  {label:"Hold",       secs:4, scale:1.0},
+  {label:"Breathe out",secs:4, scale:0.55},
+  {label:"Hold",       secs:4, scale:0.55}
+];
+const SOFT = [
+  {label:"Breathe in", secs:4, scale:1.0},
+  {label:"Breathe out",secs:6, scale:0.55}
+];
+
+/* ============ exercises ============ */
+const EXERCISES = [
+{
+  id:"box", name:"Box Breathing", icon:ICONS.box,
+  blurb:"Calm acute nerves with a few slow, even breaths.",
+  duration:"2–4 min", use:"Panic spikes · pre-meeting nerves",
+  steps:[
+    {type:"intro", eyebrow:"Breathwork", title:"Settle in",
+      lead:"Sit tall, feet flat, hands resting. We'll breathe in a simple square — in, hold, out, hold. Nothing to fix, just follow the shape."},
+    {type:"slider", kind:"checkin"},
+    {type:"breath", eyebrow:"Box Breathing", title:"Follow the box", pattern:BOX, loop:true,
+      lead:"In for 4, hold for 4, out for 4, hold for 4. Continue as long as you like — tap when you're ready to finish."},
+    {type:"slider", kind:"checkout"}
+  ]
+},
+{
+  id:"cbt", name:"Thought Reframe", icon:ICONS.cbt,
+  blurb:"Untangle an anxious thought and find a fairer version.",
+  duration:"4–7 min", use:"Rumination · difficult conversations",
+  steps:[
+    {type:"intro", eyebrow:"Cognitive reframe", title:"Let's untangle it",
+      lead:"When stress spikes, the mind tells a story. We'll write it down, check it against the facts, and find a more balanced view."},
+    {type:"slider", kind:"checkin"},
+    {type:"text", key:"trigger", eyebrow:"Step 1", title:"What just happened?",
+      lead:"In one line, what triggered the stress?", placeholder:"e.g. My manager replied 'we need to talk' with no detail."},
+    {type:"text", key:"thought", eyebrow:"Step 2", title:"The thought underneath",
+      lead:"Write the worst-case story your mind is telling you.", placeholder:"e.g. I've messed up and I'm going to be in trouble."},
+    {type:"selects", key:"distortions", eyebrow:"Step 3", title:"Spot the pattern",
+      lead:"Is your mind taking a shortcut? Tap any that fit — no score, just noticing.", options:DISTORTIONS},
+    {type:"evidence", eyebrow:"Step 4", title:"Test the thought",
+      lead:"Weigh it honestly. What actually supports it — and what doesn't?"},
+    {type:"text", key:"balanced", eyebrow:"Step 5", title:"A fairer version", textarea:true,
+      lead:"If a respected colleague were in your shoes, what would you tell them? Write the balanced thought.",
+      placeholder:"e.g. 'We need to talk' could be anything. I'll know soon, and I can handle it either way.",
+      stems:STEMS},
+    {type:"slider", kind:"checkout", reveal:{key:"balanced", label:"Your balanced thought"}}
+  ]
+},
+{
+  id:"ground", name:"5-4-3-2-1 Grounding", icon:ICONS.ground,
+  blurb:"Come back to the present through your five senses.",
+  duration:"2–4 min", use:"Overwhelm · panic · micro-break",
+  steps:[
+    {type:"intro", eyebrow:"Grounding", title:"Feet on the floor",
+      lead:"Press both feet down and take one slow breath. We'll use your senses to come back to right now. Just look around — no one will notice."},
+    {type:"slider", kind:"checkin"},
+    {type:"find", count:5, sense:"see",   eyebrow:"See · 5",  title:"5 things you can see",   verb:"Look around and tap as you find each one."},
+    {type:"find", count:4, sense:"feel",  eyebrow:"Touch · 4",title:"4 things you can feel",  verb:"The chair, your sleeve, the desk's edge, your feet."},
+    {type:"find", count:3, sense:"hear",  eyebrow:"Hear · 3", title:"3 things you can hear",  verb:"Let sounds come to you, near and far."},
+    {type:"find", count:2, sense:"smell", eyebrow:"Smell · 2",title:"2 things you can smell", verb:"Coffee, paper, air. Tap skip if there's nothing.", skip:true},
+    {type:"find", count:1, sense:"taste", eyebrow:"Taste · 1",title:"1 thing you can taste",  verb:"Even just the inside of your mouth.", skip:true},
+    {type:"message", eyebrow:"Grounded", title:"Back in the room",
+      lead:"Notice your feet again. You're here, now."},
+    {type:"slider", kind:"checkout"}
+  ]
+},
+{
+  id:"pmr", name:"Desk Muscle Release", icon:ICONS.pmr,
+  blurb:"Tense and release the tension you're holding while sitting.",
+  duration:"4–6 min", use:"Shoulder/jaw tension · Zoom fatigue",
+  steps:[
+    {type:"intro", eyebrow:"Muscle relaxation", title:"Get comfortable",
+      lead:"We'll gently tense each area for about 5 seconds, then let go for 10. Never tense to the point of pain — and skip any area that's sore or injured."},
+    {type:"slider", kind:"checkin"},
+    {type:"tension", eyebrow:"Hands", title:"Make tight fists", release:"Let your hands fall open and heavy."},
+    {type:"tension", eyebrow:"Shoulders", title:"Lift toward your ears", release:"Drop them down and feel the space."},
+    {type:"tension", eyebrow:"Face & jaw", title:"Scrunch your face", release:"Soften the jaw, tongue off the roof of your mouth."},
+    {type:"tension", eyebrow:"Legs", title:"Press feet into the floor", release:"Release and let your legs go limp.", note:"Hidden under the desk — fully discreet."},
+    {type:"breath", eyebrow:"Settle", title:"Let it all settle", pattern:SOFT, loop:true,
+      lead:"Breathe slowly and scan from head to toe for any leftover tightness — and soften it. Continue when ready."},
+    {type:"slider", kind:"checkout"}
+  ]
+},
+{
+  id:"focus", name:"Task-Transition Reset", icon:ICONS.focus,
+  blurb:"A 60-second reset between tasks or back-to-back calls.",
+  duration:"1–3 min", use:"Focus · context-switching · Zoom fatigue",
+  steps:[
+    {type:"intro", eyebrow:"Mindful reset", title:"Pause the autopilot",
+      lead:"You just finished one thing. Before the next, take a real breath and a moment to aim."},
+    {type:"breath", eyebrow:"Breathe", title:"Three slow breaths", pattern:SOFT, loop:true,
+      lead:"Follow the circle. Just the breath — nothing to fix. Continue when you feel the gear-shift."},
+    {type:"selects", key:"mood", single:true, eyebrow:"Notice", title:"One word for how you feel",
+      lead:"No need to change it — just name it.", options:MOODS},
+    {type:"text", key:"intention", eyebrow:"Aim", title:"Your next intention",
+      lead:"What is the ONE thing the next block is for?", placeholder:"e.g. Draft the client reply — nothing else."},
+    {type:"message", eyebrow:"Go", title:"Carry it in", reveal:{key:"intention", label:"Your intention"},
+      lead:"Hold that one thing in mind. Begin when you're ready."}
+  ]
+},
+{
+  id:"wind", name:"End-of-Day Wind-Down", icon:ICONS.moon,
+  blurb:"Close the loops so work thoughts don't follow you home.",
+  duration:"3–5 min", use:"Detach at day's end · WFH no-commute",
+  steps:[
+    {type:"intro", eyebrow:"Wind-down", title:"Clock out, on purpose",
+      lead:"Work is ending. Let's close the open loops so your evening is yours."},
+    {type:"slider", kind:"checkin"},
+    {type:"list", key:"loops", eyebrow:"Brain-dump", title:"What's still open?",
+      lead:"List anything still on your mind. Don't solve it — just park it.", placeholder:"Add a loose end…"},
+    {type:"text", key:"first", eyebrow:"Tomorrow", title:"Tomorrow's first move",
+      lead:"Pick the single thing you'll start with tomorrow.", placeholder:"e.g. Open the budget sheet and add Q3 numbers."},
+    {type:"message", eyebrow:"Permission", title:"It can wait",
+      lead:"These are safe on the list. Nothing here needs you tonight."},
+    {type:"breath", eyebrow:"Cross over", title:"Three breaths to close", pattern:SOFT, loop:true,
+      lead:"As you breathe, let the workday end. When you're ready, stand up or close the laptop."},
+    {type:"slider", kind:"checkout"}
+  ]
+}
+];
+
+/* ============ state ============ */
+const player = { ex:null, i:0, data:{} };
+
+/* ============ HOME ============ */
+function buildHome(){
+  const wrap = $("#cards");
+  wrap.innerHTML = "";
+  EXERCISES.forEach(ex=>{
+    const c = el("button","card");
+    c.innerHTML =
+      '<div class="ic">'+ex.icon+'</div>'+
+      '<div style="flex:1">'+
+        '<h3>'+ex.name+'</h3>'+
+        '<p class="blurb">'+ex.blurb+'</p>'+
+        '<div class="meta"><span class="chip accent">'+ex.duration+'</span><span class="chip">'+ex.use+'</span></div>'+
+      '</div>';
+    c.onclick = ()=>openExercise(ex);
+    wrap.appendChild(c);
+  });
+}
+
+/* ============ PLAYER ============ */
+function openExercise(ex){
+  player.ex = ex; player.i = 0; player.data = {};
+  $("#home").style.display = "none";
+  $("#player").classList.add("on");
+  renderStep();
+}
+function exitToHome(){
+  Timers.clearAll();
+  player.data = {};               // privacy: clear everything typed
+  player.ex = null;
+  $("#player").classList.remove("on");
+  $("#home").style.display = "flex";
+  window.scrollTo(0,0);
+}
+function back(){
+  if(player.i === 0){ exitToHome(); return; }
+  player.i--; renderStep();
+}
+function next(){
+  if(player.i >= player.ex.steps.length-1){ exitToHome(); return; }
+  player.i++; renderStep();
+}
+
+function renderDots(){
+  const d = $("#dots"); d.innerHTML = "";
+  player.ex.steps.forEach((_,idx)=>{
+    const i = el("i");
+    if(idx < player.i) i.classList.add("done");
+    if(idx === player.i) i.classList.add("now");
+    d.appendChild(i);
+  });
+}
+
+function renderStep(){
+  Timers.clearAll();
+  const step = player.ex.steps[player.i];
+  const stage = $("#stage");
+  stage.innerHTML = "";
+  renderDots();
+
+  const nextBtn = $("#nextBtn");
+  nextBtn.className = "cta";
+  nextBtn.disabled = false;
+  const isLast = player.i === player.ex.steps.length-1;
+  nextBtn.textContent = isLast ? "Done" : "Continue";
+
+  // optional eyebrow + heading
+  if(step.eyebrow) stage.appendChild(el("div","eyebrow",step.eyebrow));
+  if(step.title)   stage.appendChild(el("h2",null,step.title));
+
+  // optional reveal of earlier input
+  if(step.reveal && player.data[step.reveal.key]){
+    const r = el("div","reveal");
+    r.innerHTML = '<div class="rl">'+step.reveal.label+'</div><div class="rv">'+escapeHtml(player.data[step.reveal.key])+'</div>';
+    stage.appendChild(r);
+  }
+  if(step.lead) stage.appendChild(el("p","lead",step.lead));
+
+  switch(step.type){
+    case "intro":    case "message":  break;
+    case "slider":   renderSlider(stage, step, nextBtn); break;
+    case "breath":   renderBreath(stage, step, nextBtn, true); break;
+    case "tension":  renderTension(stage, step, nextBtn); break;
+    case "text":     renderText(stage, step); break;
+    case "selects":  renderSelects(stage, step); break;
+    case "evidence": renderEvidence(stage, step); break;
+    case "find":     renderFind(stage, step, nextBtn); break;
+    case "list":     renderList(stage, step); break;
+  }
+}
+
+/* ----- slider (check-in / check-out) ----- */
+function renderSlider(stage, step, nextBtn){
+  const isOut = step.kind === "checkout";
+  if(!step.eyebrow) stage.insertBefore(el("div","eyebrow", isOut?"Check out":"Check in"), stage.firstChild);
+  if(!step.title){
+    const h = el("h2",null, isOut ? "How are you now?" : "How's your stress right now?");
+    // place after eyebrow
+    stage.insertBefore(h, stage.children[1] || null);
+  }
+  const wrap = el("div","slwrap");
+  const start = isOut ? (player.data.checkin ?? 5) : 5;
+  wrap.innerHTML =
+    '<div class="slval" id="slval">'+start+'</div>'+
+    '<div class="slcap">'+(isOut?"slide to where you are now":"0 = totally calm · 10 = overwhelmed")+'</div>'+
+    '<input type="range" min="0" max="10" step="1" value="'+start+'" id="slider">'+
+    '<div class="scaleends"><span>Calm</span><span>Overwhelmed</span></div>'+
+    '<div class="delta" id="delta"></div>'+
+    '<div class="gentle" id="gentle">That sounds really hard. Please consider reaching out for support — tap <b>♥ Help</b> at the top any time.</div>';
+  stage.appendChild(wrap);
+
+  const slider = wrap.querySelector("#slider");
+  const valEl  = wrap.querySelector("#slval");
+  const delta  = wrap.querySelector("#delta");
+  const gentle = wrap.querySelector("#gentle");
+
+  function update(){
+    const v = +slider.value;
+    valEl.textContent = v;
+    if(isOut){
+      player.data.checkout = v;
+      const before = player.data.checkin;
+      if(before != null){
+        const diff = before - v;
+        if(diff > 0) delta.innerHTML = "Down <b>"+diff+"</b> point"+(diff>1?"s":"")+" — nicely done.";
+        else if(diff === 0) delta.innerHTML = "Holding steady. That's okay too.";
+        else delta.innerHTML = "Still tense — that's alright. Be gentle with yourself.";
+      }
+    } else {
+      player.data.checkin = v;
+    }
+    gentle.classList.toggle("on", v >= 9);
+  }
+  slider.addEventListener("input", update);
+  update();
+}
+
+/* ----- breath / settle pacer ----- */
+function renderBreath(stage, step, nextBtn){
+  const mount = el("div");
+  stage.appendChild(mount);
+  runPacer(mount, step.pattern, {loop:true});
+  nextBtn.textContent = (player.i === player.ex.steps.length-1) ? "Done" : "Continue";
+  nextBtn.classList.add("pulse");
+}
+
+/* ----- tension/release (PMR) ----- */
+function renderTension(stage, step, nextBtn){
+  const amber = "radial-gradient(circle at 35% 30%, #ffd27a, #ff9b6b)";
+  const cool  = "radial-gradient(circle at 35% 30%, #7cc4ff, #a7a0ff)";
+  const phases = [
+    {label:"Squeeze", secs:5,  scale:1.18, color:amber},
+    {label:"Release", secs:10, scale:0.5,  color:cool, sub:step.release}
+  ];
+  if(step.note) stage.appendChild(el("p","lead", step.note));
+  const mount = el("div");
+  stage.appendChild(mount);
+  nextBtn.disabled = true;
+  nextBtn.textContent = "Hold on…";
+  runPacer(mount, phases, {loop:false, onDone:()=>{
+    nextBtn.disabled = false;
+    nextBtn.classList.add("pulse");
+    nextBtn.textContent = (player.i === player.ex.steps.length-1) ? "Done" : "Next area";
+  }});
+}
+
+/* core pacer engine */
+function runPacer(mount, phases, opts){
+  mount.innerHTML =
+    '<div class="pacer">'+
+      '<div class="pacer-stage">'+
+        '<div class="pacer-ring"></div>'+
+        '<div class="pacer-circle" id="pcirc"></div>'+
+        '<div class="pacer-text"><div class="pacer-label" id="plabel"></div><div class="pacer-count" id="pcount"></div></div>'+
+      '</div>'+
+      '<div class="pacer-cycles" id="pcyc"></div>'+
+    '</div>';
+  const circ = mount.querySelector("#pcirc");
+  const label= mount.querySelector("#plabel");
+  const count= mount.querySelector("#pcount");
+  const cyc  = mount.querySelector("#pcyc");
+  let idx = 0, cycles = 0;
+
+  circ.style.transform = "scale(0.55)";
+  function run(){
+    const p = phases[idx];
+    label.textContent = p.label;
+    count.textContent = p.sub || p.secs;
+    if(p.color) circ.style.background = p.color;
+    // ensure the browser applies the start state before transitioning
+    requestAnimationFrame(()=>{
+      circ.style.transition = "transform "+p.secs+"s ease-in-out, background .6s ease";
+      circ.style.transform = "scale("+p.scale+")";
+    });
+    vibrate(18);
+    let rem = p.secs;
+    if(!p.sub) count.textContent = rem;
+    const iv = Timers.interval(()=>{ rem--; if(!p.sub) count.textContent = rem>0?rem:""; }, 1000);
+    Timers.timeout(()=>{
+      clearInterval(iv);
+      idx++;
+      if(idx >= phases.length){
+        idx = 0; cycles++;
+        if(opts.loop){ cyc.textContent = cycles+" cycle"+(cycles>1?"s":"")+" complete"; }
+        else { cyc.textContent = "Done — relax."; if(opts.onDone) opts.onDone(); return; }
+      }
+      run();
+    }, p.secs*1000);
+  }
+  Timers.timeout(run, 400);
+}
+
+/* ----- single text / textarea input ----- */
+function renderText(stage, step){
+  const field = step.textarea ? el("textarea") : (function(){ const i=el("input"); i.type="text"; return i; })();
+  field.placeholder = step.placeholder || "";
+  field.value = player.data[step.key] || "";
+  field.addEventListener("input", ()=>{ player.data[step.key] = field.value; });
+  stage.appendChild(field);
+  if(step.stems){
+    const s = el("div","stems");
+    step.stems.forEach(t=>{
+      const b = el("button",null,t);
+      b.onclick = ()=>{
+        field.value = (field.value ? field.value.replace(/\s*$/,"")+"\n" : "") + t + " ";
+        player.data[step.key] = field.value; field.focus();
+      };
+      s.appendChild(b);
+    });
+    stage.appendChild(s);
+  }
+}
+
+/* ----- multi/single select chips ----- */
+function renderSelects(stage, step){
+  const set = new Set(player.data[step.key] || []);
+  const wrap = el("div","selects");
+  step.options.forEach(opt=>{
+    const b = el("button",null,opt);
+    b.setAttribute("aria-pressed", set.has(opt) ? "true":"false");
+    b.onclick = ()=>{
+      if(step.single){ set.clear(); set.add(opt);
+        wrap.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed","false")); }
+      else { set.has(opt) ? set.delete(opt) : set.add(opt); }
+      b.setAttribute("aria-pressed", set.has(opt) ? "true":"false");
+      player.data[step.key] = [...set];
+      vibrate(10);
+    };
+    wrap.appendChild(b);
+  });
+  stage.appendChild(wrap);
+}
+
+/* ----- evidence two-field ----- */
+function renderEvidence(stage, step){
+  const wrap = el("div","twocol");
+  [["evFor","Evidence FOR the thought"],["evAgainst","Evidence AGAINST it"]].forEach(([k,lab])=>{
+    const f = el("div","f");
+    f.appendChild(el("label",null,lab));
+    const ta = el("textarea");
+    ta.value = player.data[k] || "";
+    ta.addEventListener("input", ()=>{ player.data[k]=ta.value; });
+    f.appendChild(ta);
+    wrap.appendChild(f);
+  });
+  stage.appendChild(wrap);
+}
+
+/* ----- tap-to-find slots (grounding) ----- */
+function renderFind(stage, step, nextBtn){
+  const wrap = el("div","slots");
+  let found = 0;
+  for(let n=1; n<=step.count; n++){
+    const slot = el("div","slot");
+    slot.setAttribute("aria-pressed","false");
+    slot.innerHTML = '<div class="num">'+n+'</div><div class="lab">Tap when you notice one</div>';
+    slot.onclick = ()=>{
+      const on = slot.getAttribute("aria-pressed")==="true";
+      slot.setAttribute("aria-pressed", on?"false":"true");
+      slot.querySelector(".lab").textContent = on ? "Tap when you notice one" : "Noticed ✓";
+      found += on ? -1 : 1; vibrate(12); refresh();
+    };
+    wrap.appendChild(slot);
+  }
+  stage.appendChild(wrap);
+  if(step.skip){
+    const sk = el("button","linkbtn","Nothing here — skip");
+    sk.style.marginTop = "4px";
+    sk.onclick = ()=>next();
+    stage.appendChild(sk);
+  }
+  nextBtn.disabled = true;
+  function refresh(){
+    nextBtn.disabled = found < step.count;
+    if(!nextBtn.disabled) nextBtn.classList.add("pulse");
+    else nextBtn.classList.remove("pulse");
+  }
+}
+
+/* ----- add-to-list (brain dump) ----- */
+function renderList(stage, step){
+  if(!player.data[step.key]) player.data[step.key] = [];
+  const list = player.data[step.key];
+
+  const row = el("div","addrow");
+  const input = el("input"); input.type="text"; input.placeholder = step.placeholder||"Add…";
+  const addBtn = el("button",null,"Add");
+  row.appendChild(input); row.appendChild(addBtn);
+  stage.appendChild(row);
+
+  const items = el("div","items");
+  stage.appendChild(items);
+
+  function draw(){
+    items.innerHTML = "";
+    list.forEach((txt,idx)=>{
+      const it = el("div","it");
+      it.innerHTML = '<span>'+escapeHtml(txt)+'</span>';
+      const x = el("button",null,"×");
+      x.onclick = ()=>{ list.splice(idx,1); draw(); };
+      it.appendChild(x);
+      items.appendChild(it);
+    });
+  }
+  function add(){
+    const v = input.value.trim();
+    if(!v) return;
+    list.push(v); input.value=""; input.focus(); vibrate(10); draw();
+  }
+  addBtn.onclick = add;
+  input.addEventListener("keydown", e=>{ if(e.key==="Enter") add(); });
+  draw();
+}
+
+/* ============ utils ============ */
+function escapeHtml(s){ return s.replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* ============ sheets / settings ============ */
+function openSheet(id){ $(id).classList.add("on"); }
+function closeSheets(){ document.querySelectorAll(".scrim").forEach(s=>s.classList.remove("on")); }
+
+$("#helpBtn").onclick  = ()=>openSheet("#helpScrim");
+$("#helpBtn2").onclick = ()=>openSheet("#helpScrim");
+$("#aboutBtn").onclick = ()=>openSheet("#aboutScrim");
+document.querySelectorAll("[data-close]").forEach(b=> b.onclick = closeSheets);
+document.querySelectorAll(".scrim").forEach(s=> s.addEventListener("click", e=>{ if(e.target===s) closeSheets(); }));
+
+$("#hapticToggle").onchange = e => { settings.haptics = e.target.checked; if(e.target.checked) vibrate(20); };
+function applyTheme(light){
+  document.documentElement.setAttribute("data-theme", light?"light":"dark");
+  $("#lightToggle").checked = light;
+  try{ localStorage.setItem("pause-theme", light?"light":"dark"); }catch(e){}
+}
+$("#lightToggle").onchange = e => applyTheme(e.target.checked);
+$("#themeBtn").onclick = ()=> applyTheme(document.documentElement.getAttribute("data-theme")!=="light");
+
+/* player buttons */
+$("#nextBtn").onclick = next;
+$("#backBtn").onclick = back;
+$("#exitBtn").onclick = exitToHome;
+
+/* ============ init ============ */
+(function init(){
+  let saved = "dark";
+  try{ saved = localStorage.getItem("pause-theme") || "dark"; }catch(e){}
+  applyTheme(saved === "light");
+  buildHome();
+})();
+</script>
+</body>
+</html>
