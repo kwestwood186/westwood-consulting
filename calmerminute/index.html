@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0f1729">
 <title>Pause — Workplace Calm</title>
 <style>
@@ -226,6 +225,37 @@
   .switch .tr:before{content:""; position:absolute; width:24px;height:24px; border-radius:50%; background:#fff; top:3px; left:3px; transition:.2s;}
   .switch input:checked + .tr{background:var(--accent);}
   .switch input:checked + .tr:before{transform:translateX(20px);}
+
+  /* ---------- PATH retention layer ---------- */
+  input[type=date]{
+    width:100%; background:var(--card); color:var(--ink);
+    border:1px solid var(--line); border-radius:14px; padding:14px;
+    font:inherit; font-size:16px; line-height:1.5;
+  }
+  input[type=date]:focus{outline:none; border-color:var(--accent);}
+  html[data-theme="dark"] input[type=date]::-webkit-calendar-picker-indicator{filter:invert(1) opacity(.6);}
+  .sheet{position:relative;}
+  .sheet .x{
+    position:absolute; top:14px; right:14px; width:34px; height:34px; border-radius:50%;
+    border:1px solid var(--line); background:var(--card); color:var(--ink);
+    font-size:20px; line-height:1; cursor:pointer; display:grid; place-items:center;
+  }
+  .sheet .x:active{transform:scale(.94);}
+  .path-support{margin-top:20px; border-top:1px solid var(--line); padding-top:18px;}
+  .path-support .lbl{font-size:12px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--accent); margin-bottom:10px;}
+  .path-cta{
+    width:100%; border:none; border-radius:16px; padding:16px; font-size:16px; font-weight:700; cursor:pointer;
+    background:linear-gradient(120deg, var(--sky), var(--lav)); color:#06122a;
+    box-shadow:0 10px 26px rgba(124,196,255,.28); display:flex; align-items:center; justify-content:center; gap:9px;
+  }
+  .path-cta:active{transform:scale(.99);}
+  .opt-card{width:100%; margin-bottom:12px;}
+  .opt-card:last-child{margin-bottom:0;}
+  .opt-card h3{font-size:17px; margin:0 0 3px;}
+  .sheet .cta + .cta{margin-top:10px;}
+  .field-err{color:var(--rose); font-size:13px; margin:10px 0 0; display:none;}
+  .field-err.on{display:block;}
 </style>
 </head>
 <body>
@@ -244,10 +274,17 @@
       <p>Short, science-backed exercises for stressful moments at work. Silent, discreet, and private — your words never leave this device.</p>
     </div>
     <div class="grid" id="cards"></div>
+
+    <div class="path-support">
+      <div class="lbl">PATH client support</div>
+      <button class="path-cta" id="finBtn">♦ I need financial support</button>
+    </div>
+
     <div class="disclaimer">
       These are self-guided wellness tools, not therapy or medical advice. If you're in distress,
       <button class="linkbtn" id="helpBtn2">find urgent help</button>.
       <br>· <button class="linkbtn" id="aboutBtn">About &amp; privacy</button>
+      · <button class="linkbtn" id="updateInfoBtn">Update my info</button>
     </div>
   </main>
 
@@ -291,6 +328,62 @@
     </div>
     <p style="margin-top:14px">Not a substitute for professional care. If stress is persistent or severe, consider speaking with your doctor, an EAP counsellor, or a mental-health professional.</p>
     <button class="cta ghost" data-close>Close</button>
+  </div>
+</div>
+
+<!-- PATH: EMPLOYMENT INTAKE SHEET -->
+<div class="scrim" id="intakeScrim">
+  <div class="sheet">
+    <button class="x" data-close aria-label="Close">×</button>
+    <h3>A little about your work</h3>
+    <p>PATH Employment Services likes to celebrate your milestones and can help with work-related costs. Share a few details — they stay on this device unless you choose to send them.</p>
+    <div class="twocol">
+      <div class="f"><label for="inName">First name</label><input type="text" id="inName" placeholder="e.g. Jordan" autocomplete="given-name"></div>
+      <div class="f"><label for="inEmployer">Employer name</label><input type="text" id="inEmployer" placeholder="e.g. Maple Café"></div>
+      <div class="f"><label for="inStart">Employment start date</label><input type="date" id="inStart"></div>
+    </div>
+    <p class="field-err" id="intakeErr">Please fill in all three fields.</p>
+    <button class="cta" id="intakeSave" style="margin-top:16px">Save</button>
+  </div>
+</div>
+
+<!-- PATH: MILESTONE — STILL EMPLOYED -->
+<div class="scrim" id="mileScrim">
+  <div class="sheet">
+    <button class="x" id="mileX" aria-label="Close">×</button>
+    <h3>Congratulations! 🎉</h3>
+    <p id="mileMsg"></p>
+    <button class="cta" id="mileYes">Yes, let PATH know</button>
+    <button class="cta ghost" id="mileGone">I'm no longer working there</button>
+    <button class="linkbtn" id="mileSnooze" style="display:block; margin:14px auto 0;">Not right now</button>
+  </div>
+</div>
+
+<!-- PATH: MILESTONE — NO LONGER EMPLOYED -->
+<div class="scrim" id="goneScrim">
+  <div class="sheet">
+    <button class="x" id="goneX" aria-label="Close">×</button>
+    <h3>We're here for you</h3>
+    <p>We're sorry to hear that. Would you like to connect with PATH to explore new job opportunities?</p>
+    <button class="cta" id="goneYes">Yes, connect me with PATH</button>
+    <button class="cta ghost" id="goneNo">No thanks</button>
+  </div>
+</div>
+
+<!-- PATH: FINANCIAL SUPPORT -->
+<div class="scrim" id="finScrim">
+  <div class="sheet">
+    <button class="x" data-close aria-label="Close">×</button>
+    <h3>What do you need support with?</h3>
+    <p>PATH may be able to help with work-related costs. Choose an option to start an email to the retention team.</p>
+    <button class="card opt-card" id="finTransport">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#7cc4ff" stroke-width="2"><path d="M4 16V7a2 2 0 0 1 2-2h9l4 5v6"/><circle cx="8" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M4 16h2M10 16h5"/></svg></div>
+      <div style="flex:1"><h3>Transportation support</h3><p class="blurb">Help with travel costs related to getting to work.</p></div>
+    </button>
+    <button class="card opt-card" id="finClothing">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#a7a0ff" stroke-width="2"><path d="M9 3l3 2 3-2 5 4-3 3-2-1v10H6V9L4 10 1 7z"/></svg></div>
+      <div style="flex:1"><h3>Work clothing &amp; grooming</h3><p class="blurb">Support for work-appropriate clothing or grooming.</p></div>
+    </button>
   </div>
 </div>
 
@@ -818,6 +911,208 @@ $("#exitBtn").onclick = exitToHome;
   try{ saved = localStorage.getItem("pause-theme") || "dark"; }catch(e){}
   applyTheme(saved === "light");
   buildHome();
+})();
+
+/* ============================================================
+   PATH Employment — retention support layer
+   - All data lives in localStorage; nothing is sent automatically.
+   - Mailto links are only opened on an explicit user click.
+   ============================================================ */
+(function pathRetention(){
+  "use strict";
+
+  const RETENTION_EMAIL = "retention@pathemployment.com";
+  const KEYS = { name:"calmer_userName", employer:"calmer_employer", start:"calmer_startDate", ack:"calmer_milestonesAcknowledged" };
+  const MILESTONES = [
+    { key:"1month",  months:1,  label:"1-month"  },
+    { key:"3month",  months:3,  label:"3-month"  },
+    { key:"6month",  months:6,  label:"6-month"  },
+    { key:"12month", months:12, label:"1-year"   }
+  ];
+
+  /* ---- storage helpers (defensive: private mode / disabled storage) ---- */
+  function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+  function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  function getInfo(){
+    return { name:lsGet(KEYS.name), employer:lsGet(KEYS.employer), start:lsGet(KEYS.start) };
+  }
+  function hasInfo(){
+    const i = getInfo();
+    return !!(i.name && i.employer && i.start);
+  }
+  function getAck(){
+    try{ const a = JSON.parse(lsGet(KEYS.ack) || "[]"); return Array.isArray(a) ? a : []; }
+    catch(e){ return []; }
+  }
+  function addAck(key){
+    const a = getAck();
+    if(!a.includes(key)){ a.push(key); lsSet(KEYS.ack, JSON.stringify(a)); }
+  }
+
+  /* ---- date helpers ---- */
+  function parseDate(s){
+    if(!s) return null;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s.trim());
+    if(m) return new Date(+m[1], +m[2]-1, +m[3]);   // parse as LOCAL date
+    const d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  function addMonths(date, months){
+    const target = new Date(date.getFullYear(), date.getMonth()+months, 1);
+    const lastDay = new Date(target.getFullYear(), target.getMonth()+1, 0).getDate();
+    target.setDate(Math.min(date.getDate(), lastDay));
+    return target;
+  }
+  function dayDiff(a, b){ // whole days between two dates, ignoring time
+    const da = new Date(a.getFullYear(), a.getMonth(), a.getDate());
+    const db = new Date(b.getFullYear(), b.getMonth(), b.getDate());
+    return Math.round((da - db) / 86400000);
+  }
+  function prettyDate(s){
+    const d = parseDate(s);
+    if(!d) return s || "";
+    try{ return d.toLocaleDateString(undefined, {year:"numeric", month:"long", day:"numeric"}); }
+    catch(e){ return s; }
+  }
+
+  /* ---- mailto helper ---- */
+  function openMail(subject, body){
+    const url = "mailto:" + RETENTION_EMAIL +
+      "?subject=" + encodeURIComponent(subject) +
+      "&body=" + encodeURIComponent(body);
+    window.location.href = url;
+  }
+
+  /* =================== employment intake =================== */
+  function openIntake(){
+    const i = getInfo();
+    $("#inName").value     = i.name || "";
+    $("#inEmployer").value = i.employer || "";
+    $("#inStart").value    = i.start || "";
+    $("#intakeErr").classList.remove("on");
+    openSheet("#intakeScrim");
+  }
+  $("#intakeSave").onclick = function(){
+    const name     = $("#inName").value.trim();
+    const employer = $("#inEmployer").value.trim();
+    const start    = $("#inStart").value.trim();
+    if(!name || !employer || !start || !parseDate(start)){
+      $("#intakeErr").classList.add("on");
+      return;
+    }
+    lsSet(KEYS.name, name);
+    lsSet(KEYS.employer, employer);
+    lsSet(KEYS.start, start);
+    closeSheets();
+    checkMilestones();   // first-time setup may already be near a milestone
+  };
+  $("#updateInfoBtn").onclick = openIntake;
+
+  /* =================== milestone detection =================== */
+  let currentMilestone = null;   // key of the milestone currently being shown
+
+  function checkMilestones(){
+    const info = getInfo();
+    const start = parseDate(info.start);
+    if(!start) return;
+    const today = new Date();
+    const ack = getAck();
+
+    for(const ms of MILESTONES){
+      if(ack.includes(ms.key)) continue;
+      const anniversary = addMonths(start, ms.months);
+      // Fire from 3 days BEFORE the anniversary onward, with no upper limit.
+      // Once an anniversary is reached it stays pending — a day or weeks late
+      // is fine — and keeps re-appearing until the user gives a yes/no.
+      if(dayDiff(today, anniversary) >= -3){
+        showMilestone(ms, info);
+        break;   // one popup at a time; any earlier-missed ones wait for the next open
+      }
+    }
+  }
+
+  function showMilestone(ms, info){
+    currentMilestone = ms.key;
+    $("#mileMsg").textContent =
+      "Congratulations on your " + ms.label + " work anniversary! We're so proud of you. " +
+      "Would you like to let PATH know so we can celebrate with you?";
+    openSheet("#mileScrim");
+  }
+
+  // Permanently resolve the active milestone so it won't pop again.
+  // Only an explicit yes/no calls this — snoozing/dismissing never does.
+  function concludeMilestone(){
+    if(currentMilestone){ addAck(currentMilestone); currentMilestone = null; }
+  }
+
+  $("#mileYes").onclick = function(){
+    const info = getInfo();
+    const ms = MILESTONES.find(m => m.key === currentMilestone);
+    const label = ms ? ms.label : "work";
+    const subject = info.name + " – " + label + " Work Anniversary at " + info.employer;
+    const body = "Hi PATH team, " + info.name + " has reached their " + label +
+      " anniversary working at " + info.employer + ", starting " + prettyDate(info.start) +
+      ". Please celebrate with them!";
+    concludeMilestone();
+    closeSheets();
+    openMail(subject, body);
+  };
+
+  $("#mileGone").onclick = function(){
+    // hand off to the gone flow, which resolves the milestone via its own yes/no
+    closeSheets();
+    openSheet("#goneScrim");
+  };
+
+  // "Not right now" + plain dismissal (X / click-outside) only SNOOZE:
+  // the milestone is left unacknowledged, so it pops again on the next open
+  // until the user chooses Yes or No.
+  $("#mileSnooze").onclick = function(){ closeSheets(); };
+  $("#mileX").onclick      = function(){ closeSheets(); };
+
+  $("#goneYes").onclick = function(){
+    const info = getInfo();
+    const subject = info.name + " – Looking for New Work";
+    const body = "Hi PATH team, " + info.name + " is looking for new work. They were previously employed at " +
+      info.employer + ", starting " + prettyDate(info.start) +
+      ". Please connect with them to explore new opportunities.";
+    concludeMilestone();   // a definite answer — done
+    closeSheets();
+    openMail(subject, body);
+  };
+  $("#goneNo").onclick = function(){ concludeMilestone(); closeSheets(); };   // a definite "no" — done
+  // Dismissing the gone modal without answering snoozes (celebration returns next open).
+  $("#goneX").onclick  = function(){ closeSheets(); };
+
+  /* =================== financial support =================== */
+  $("#finBtn").onclick = ()=> openSheet("#finScrim");
+
+  function finName(){ return getInfo().name || "A PATH client"; }
+  function finEmployer(){ return getInfo().employer || "their employer"; }
+
+  $("#finTransport").onclick = function(){
+    const subject = finName() + " – Transportation Support Request";
+    const body = "Hi PATH team, " + finName() + " (working at " + finEmployer() +
+      ") is requesting help with transportation costs related to getting to work. " +
+      "Please follow up with them.";
+    closeSheets();
+    openMail(subject, body);
+  };
+  $("#finClothing").onclick = function(){
+    const subject = finName() + " – Work Clothing & Grooming Request";
+    const body = "Hi PATH team, " + finName() + " (working at " + finEmployer() +
+      ") is requesting support for work clothing or grooming. " +
+      "Please follow up with them.";
+    closeSheets();
+    openMail(subject, body);
+  };
+
+  /* =================== boot =================== */
+  if(hasInfo()){
+    checkMilestones();
+  } else {
+    openIntake();   // first visit: collect details, then milestones run on save
+  }
 })();
 </script>
 </body>
